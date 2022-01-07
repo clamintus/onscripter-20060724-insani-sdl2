@@ -1,0 +1,46 @@
+# -*- Makefile -*-
+#
+# Makefile.Win.msys - Makefile rules for windows
+#
+
+
+INCS = -Iinclude  -IC:/msys64/mingw64/include/SDL2  -IC:/msys64/mingw64/include -IC:/msys64/mingw64/include/smpeg2
+
+# with OggVorbis and English mode and insani
+LIBS = -static -Wl,--allow-multiple-definition \
+       -Wl,--start-group \
+            -Llib \
+            `sdl2-config --static-libs` `smpeg2-config --libs` \
+            -lSDL2_image -lSDL2_ttf -lSDL2_mixer \
+            -lvorbisfile -lbz2 -lvorbis -logg -lopusfile -lopus.dll \
+            -lwebp -lmpg123 -lshlwapi -lFLAC -ljpeg -lpng -lfreetype \
+            -lharfbuzz.dll -lgraphite2 -lz -lbrotlidec -lbrotlicommon \
+            -ltiff -lzstd -ldeflate -ljbig -lLerc.dll -llzma \
+            -lstdc++ \
+       -Wl,--end-group \
+#LIBS += -lgpm -lslang  -ldirectfb -lfusion -ldirect -lvga -lesd -lartsc -lasound -lX11 -laa -ldl
+
+DEFS = -DWIN32 -DUSE_OGG_VORBIS -DENABLE_1BYTE_CHAR -DFORCE_1BYTE_CHAR -DINSANI -DMSYS -DSDL2
+
+EXESUFFIX = .exe
+OBJSUFFIX = .o
+
+.SUFFIXES:
+.SUFFIXES: $(OBJSUFFIX) .cpp .h
+
+# for GNU g++
+CC = g++ 
+LD = g++ -o 
+
+#CFLAGS = -g -w -Wpointer-arith -Wno-write-strings -Wno-narrowing -pipe -c $(INCS) $(DEFS)
+CFLAGS = -O2 -w -fomit-frame-pointer -Wno-write-strings -Wno-narrowing -pipe -c $(INCS) $(DEFS)
+
+
+RM = rm -f
+
+TARGET = onscripter$(EXESUFFIX)
+#TARGET = sardec$(EXESUFFIX) nsadec$(EXESUFFIX) sarconv$(EXESUFFIX) nsaconv$(EXESUFFIX)
+#TARGET = onscripter$(EXESUFFIX) sardec$(EXESUFFIX) nsadec$(EXESUFFIX) sarconv$(EXESUFFIX) nsaconv$(EXESUFFIX) simple_aviplay$(EXESUFFIX)
+#EXT_OBJS = AVIWrapper$(OBJSUFFIX)
+
+include Makefile.onscripter

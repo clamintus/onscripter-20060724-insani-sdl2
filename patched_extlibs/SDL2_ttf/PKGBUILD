@@ -1,0 +1,56 @@
+# Maintaner: Marty Plummer (The_NetZ) <ntzrmtthihu777 (at) gmail (dot) com>
+# Contributor: Sven-Hendrik Haase <sh@lutzhaase.com>
+
+_realname=SDL2_ttf
+pkgbase=mingw-w64-${_realname}
+pkgname=${MINGW_PACKAGE_PREFIX}-${_realname}
+pkgver=2.0.15
+pkgrel=1
+pkgdesc="A library that allows you to use TrueType fonts in your SDL applications (Version 2) (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32')
+url="https://libsdl.org/projects/SDL_ttf"
+license=('MIT')
+depends=("${MINGW_PACKAGE_PREFIX}-SDL2"
+         "${MINGW_PACKAGE_PREFIX}-freetype")
+makedepends=("${MINGW_PACKAGE_PREFIX}-cmake" "${MINGW_PACKAGE_PREFIX}-autotools")
+source=("${url}/release/${_realname}-${pkgver}.zip"
+        "bug1433.patch")
+sha256sums=('cdb72b5b1c3b27795fa128af36f369fee5d3e38a96c350855da0b81880555dbc'
+            'D13DA7CA38660EA299DF4A3D495DF73CA49DF81265FE2D57568C0FA276F7D62E')
+
+prepare() {
+  cd "${srcdir}/${_realname}-${pkgver}"
+
+  # https://bugs.archlinux.org/task/28674
+  patch -Np1 -i "${srcdir}/bug1433.patch"
+}
+
+build() {
+  [[ -d ${srcdir}/build-${MINGW_CHOST} ]] && rm -rf ${srcdir}/build-${MINGW_CHOST}
+  mkdir -p ${srcdir}/build-${MINGW_CHOST}
+  cd ${srcdir}/build-${MINGW_CHOST}
+
+  ../${_realname}-${pkgver}/configure \
+    --prefix=${MINGW_PREFIX} \
+    --build=${MINGW_CHOST} \
+    --host=${MINGW_CHOST} \
+    --target=${MINGW_CHOST} \
+    --enable-shared \
+    --enable-static
+
+  make
+}
+
+package() {
+  cd "${srcdir}/build-${MINGW_CHOST}/"
+
+  make DESTDIR="${pkgdir}/" install
+  install -Dm644 ${srcdir}/${_realname}-${pkgver}/COPYING.txt "${pkgdir}${MINGW_PREFIX}/share/licenses/${_realname}/LICENSE"
+
+  cp -r "${pkgdir}${MINGW_PREFIX}/include" ../../../../
+  cp -r "${pkgdir}${MINGW_PREFIX}/lib" ../../../../
+  cp -r "${pkgdir}${MINGW_PREFIX}/share" ../../../../
+  cp -r "${srcdir}/${_realname}-${pkgver}" ../../../../src
+
+}
