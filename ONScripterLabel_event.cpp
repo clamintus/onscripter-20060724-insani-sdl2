@@ -39,6 +39,10 @@
 #define ONS_FADE_EVENT    (SDL_USEREVENT+6)
 #endif
 
+#ifdef SDL2
+#define FPS_TO_FRAMETIME(frames) 1000 / frames
+#endif 
+
 #define EDIT_MODE_PREFIX "[EDIT MODE]  "
 #define EDIT_SELECT_STRING "MP3 vol (m)  SE vol (s)  Voice vol (v)  Numeric variable (n)"
 
@@ -1128,6 +1132,11 @@ void ONScripterLabel::timerEvent( void )
             readToken();
             advancePhase();
         }
+
+        #ifdef SDL2
+            SDL_Delay( FPS_TO_FRAMETIME( 83 ) );
+        #endif
+
         return;
     }
     else{
@@ -1154,8 +1163,8 @@ int ONScripterLabel::eventLoop()
     advancePhase();
 
 #ifdef SDL2
-    while ( SDL_WaitEvent(&event) || 1 ) {    // ugly workaround, but it works :D
-        SDL_PumpEvents();
+    while (1) {
+      while ( SDL_PollEvent(&event) ) {
 #else
     while ( SDL_WaitEvent(&event) ) {
 #endif
@@ -1293,6 +1302,13 @@ int ONScripterLabel::eventLoop()
           default:
             break;
         }
+
+#ifdef SDL2
+      }
+
+      SDL_Delay( FPS_TO_FRAMETIME( 60 ) );
+#endif
+
     }
     
     return -1;
