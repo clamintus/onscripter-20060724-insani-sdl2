@@ -47,9 +47,9 @@ int NsaReader::open( char *nsa_path, int archive_type )
     int i;
     char archive_name[256], archive_name2[256];
 
-    if ( !SarReader::open( "arc.sar" ) ) return 0;
+    if ( SarReader::open( "arc.sar" ) != 0 )
+        sar_flag = false;
     
-    sar_flag = false;
     if ( !nsa_path ) nsa_path = "";
 
     sprintf( archive_name, "%s%s.%s", nsa_path, NSA_ARCHIVE_NAME, nsa_archive_ext );
@@ -135,10 +135,11 @@ size_t NsaReader::getFileLengthSub( ArchiveInfo *ai, const char *file_name )
 
 size_t NsaReader::getFileLength( const char *file_name )
 {
-    if ( sar_flag ) return SarReader::getFileLength( file_name );
-
     size_t ret;
     int i;
+
+    if ( sar_flag ) 
+        if ( ret = SarReader::getFileLength( file_name ) ) return ret;
     
     if ( ( ret = DirectReader::getFileLength( file_name ) ) ) return ret;
     
@@ -155,7 +156,8 @@ size_t NsaReader::getFile( const char *file_name, unsigned char *buffer, int *lo
 {
     size_t ret;
 
-    if ( sar_flag ) return SarReader::getFile( file_name, buffer, location );
+    if ( sar_flag )
+        if ( ret = SarReader::getFile( file_name, buffer, location ) ) return ret;
 
     if ( ( ret = DirectReader::getFile( file_name, buffer, location ) ) ) return ret;
 
