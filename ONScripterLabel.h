@@ -698,6 +698,9 @@ private:
 
     void flush( int refresh_mode, SDL_Rect *rect=NULL, bool clear_dirty_flag=true, bool direct_flag=false );
     void flushDirect( SDL_Rect &rect, int refresh_mode );
+#ifdef SDL2
+    void fastFlushDirect( SDL_Rect rects[], int numrects, int refresh_mode );
+#endif
     void executeLabel();
     SDL_Surface *loadImage( char *file_name );
     int parseLine();

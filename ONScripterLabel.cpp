@@ -715,8 +715,15 @@ void ONScripterLabel::resetSentenceFont()
     sentence_font_info.pos.h = screen_height+1;
 }
 
+struct timespec start, end;
+uint64_t delta_us;
+
 void ONScripterLabel::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag, bool direct_flag )
 {
+
+#ifdef DEBUG
+    clock_gettime( CLOCK_MONOTONIC, &start );
+#endif
 
     if ( direct_flag ){
         flushDirect( *rect, refresh_mode );
@@ -729,20 +736,32 @@ void ONScripterLabel::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_
                 flushDirect( dirty_rect.bounding_box, refresh_mode );
             }
             else{
+#ifdef SDL2
+                fastFlushDirect( dirty_rect.history, dirty_rect.num_history, refresh_mode );
+#else
                 for ( int i=0 ; i<dirty_rect.num_history ; i++ ){
-                    //printf("%d: ", i );
+                #ifdef DEBUG
+                    printf("\t%d: ", i );
+                #endif
                     flushDirect( dirty_rect.history[i], refresh_mode );
                 }
+#endif
             }
         }
     }
 
     if ( clear_dirty_flag ) dirty_rect.clear();
+
+#ifdef DEBUG
+    clock_gettime( CLOCK_MONOTONIC, &end );
+    delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    printf( "Flush took %6lu microseconds (%5.3f frames)\n", delta_us, (delta_us / 1000) / 16.0F );
+#endif
 }
 
 void ONScripterLabel::flushDirect( SDL_Rect &rect, int refresh_mode )
 {
-    //printf("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
+    // printf("flush %d: %d %d %d %d\n", refresh_mode, rect.x, rect.y, rect.w, rect.h );
 
     refreshSurface( accumulation_surface, &rect, refresh_mode );
 
@@ -754,6 +773,33 @@ void ONScripterLabel::flushDirect( SDL_Rect &rect, int refresh_mode )
     SDL_UpdateRect( screen_surface, rect.x, rect.y, rect.w, rect.h );
 #endif
 }
+
+#ifdef SDL2
+void ONScripterLabel::fastFlushDirect( SDL_Rect rects[], int numrects, int refresh_mode )
+{
+ #ifdef DEBUG
+    // clock_gettime( CLOCK_MONOTONIC, &start );
+    for ( int i=0; i < numrects; i++ )
+        printf("flush %d: %d %d %d %d\n", refresh_mode, rects[i].x, rects[i].y, rects[i].w, rects[i].h );
+ #endif
+    
+    for ( int i=0; i < numrects; i++ )
+    {
+        refreshSurface( accumulation_surface, &rects[ i ], refresh_mode );
+
+        if ( SDL_BlitSurface( accumulation_surface, &rects[ i ], screen_surface, &rects[ i ] ) != 0 )
+            SDL_Quit();
+    }
+
+    SDL_UpdateWindowSurfaceRects( window, rects, numrects );
+    
+ #ifdef DEBUG
+    // clock_gettime( CLOCK_MONOTONIC, &end );
+    // delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+    // printf("flush %d: %d %d %d %d\nTook %lu microseconds\n", refresh_mode, rect.x, rect.y, rect.w, rect.h, delta_us );
+ #endif
+}
+#endif
 
 void ONScripterLabel::mouseOverCheck( int x, int y )
 {

@@ -845,9 +845,21 @@ int ONScripterLabel::processText()
                     clickstr_state = CLICK_NONE;
                 }
                 else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '@'){
+#ifdef SDL2
+                    if ( skip_to_wait ){
+                        fastFlushDirect( dirty_rect.history, dirty_rect.num_history, refreshMode() );
+                        dirty_rect.clear();
+                    }
+#endif
                     return clickWait( out_text );
                 }
                 else if (script_h.getStringBuffer()[ string_buffer_offset + 1 ] == '\\'){
+#ifdef SDL2
+                    if ( skip_to_wait ){
+                        fastFlushDirect( dirty_rect.history, dirty_rect.num_history, refreshMode() );
+                        dirty_rect.clear();
+                    }
+#endif
                     return clickNewPage( out_text );
                 }
                 else{
@@ -866,6 +878,10 @@ int ONScripterLabel::processText()
         bool flush_flag = true;
         if ( skip_flag || draw_one_page_flag || ctrl_pressed_status )
             flush_flag = false;
+#ifdef SDL2
+        if ( skip_to_wait )
+            flush_flag = false;
+#endif
         if ( script_h.getStringBuffer()[ string_buffer_offset + 1 ] &&
              script_h.getStringBuffer()[ string_buffer_offset + 1 ] != 0x0a &&
              !(script_h.getEndStatus() & ScriptHandler::END_1BYTE_CHAR)){
