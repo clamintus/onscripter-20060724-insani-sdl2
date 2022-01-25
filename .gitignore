@@ -1,0 +1,14 @@
+.*/
+
+# Built libs
+lib/*
+patched_extlibs/SDL2_ttf/*
+include/SDL2
+
+# Build
+*.o
+*.exe
+
+# Debug
+test/
+Makefile.Win.msys2.debug
