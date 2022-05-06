@@ -71,6 +71,15 @@ void FontInfo::reset()
 
 void *FontInfo::openFont( char *font_file, int ratio1, int ratio2 )
 {
+#ifdef DEBUG
+    pitch_xy[0] -= font_size_xy[0];
+    pitch_xy[1] -= font_size_xy[1];
+    font_size_xy[0] *= 1.5;
+    font_size_xy[1] *= 1.5;
+    pitch_xy[0] += font_size_xy[0];
+    pitch_xy[1] += font_size_xy[1];
+#endif
+
     int font_size;
     if ( font_size_xy[0] < font_size_xy[1] )
         font_size = font_size_xy[0];

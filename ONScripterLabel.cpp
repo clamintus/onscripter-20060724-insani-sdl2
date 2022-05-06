@@ -31,7 +31,7 @@ extern "C" void waveCallback( int channel );
 #define FONT_FILE "default.ttf"
 #define REGISTRY_FILE "registry.txt"
 #define DLL_FILE "dll.txt"
-#define DEFAULT_ENV_FONT "‚l‚r ƒSƒVƒbƒN"
+#define DEFAULT_ENV_FONT "ï¿½lï¿½r ï¿½Sï¿½Vï¿½bï¿½N"
 #define DEFAULT_VOLUME 100
 
 typedef int (ONScripterLabel::*FuncList)();
@@ -289,6 +289,11 @@ void ONScripterLabel::initSDL()
     screen_ratio2 *= 320;
     screen_width   = screen_width  * PDA_WIDTH / 320;
     screen_height  = screen_height * PDA_WIDTH / 320;
+#endif
+
+#ifdef DEBUG
+    screen_width  = 960;
+    screen_height = 720;
 #endif
 
 #ifdef SDL2
@@ -721,9 +726,9 @@ uint64_t delta_us;
 void ONScripterLabel::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_flag, bool direct_flag )
 {
 
-#ifdef DEBUG
-    clock_gettime( CLOCK_MONOTONIC, &start );
-#endif
+// #ifdef DEBUG
+//     clock_gettime( CLOCK_MONOTONIC, &start );
+// #endif
 
     if ( direct_flag ){
         flushDirect( *rect, refresh_mode );
@@ -752,11 +757,11 @@ void ONScripterLabel::flush( int refresh_mode, SDL_Rect *rect, bool clear_dirty_
 
     if ( clear_dirty_flag ) dirty_rect.clear();
 
-#ifdef DEBUG
-    clock_gettime( CLOCK_MONOTONIC, &end );
-    delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-    printf( "Flush took %6lu microseconds (%5.3f frames)\n", delta_us, (delta_us / 1000) / 16.0F );
-#endif
+// #ifdef DEBUG
+//     clock_gettime( CLOCK_MONOTONIC, &end );
+//     delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+//     printf( "Flush took %6lu microseconds (%5.3f frames)\n", delta_us, (delta_us / 1000) / 16.0F );
+// #endif
 }
 
 void ONScripterLabel::flushDirect( SDL_Rect &rect, int refresh_mode )
@@ -777,11 +782,11 @@ void ONScripterLabel::flushDirect( SDL_Rect &rect, int refresh_mode )
 #ifdef SDL2
 void ONScripterLabel::fastFlushDirect( SDL_Rect rects[], int numrects, int refresh_mode )
 {
- #ifdef DEBUG
-    // clock_gettime( CLOCK_MONOTONIC, &start );
-    for ( int i=0; i < numrects; i++ )
-        printf("flush %d: %d %d %d %d\n", refresh_mode, rects[i].x, rects[i].y, rects[i].w, rects[i].h );
- #endif
+//  #ifdef DEBUG
+//     // clock_gettime( CLOCK_MONOTONIC, &start );
+//     for ( int i=0; i < numrects; i++ )
+//         printf("flush %d: %d %d %d %d\n", refresh_mode, rects[i].x, rects[i].y, rects[i].w, rects[i].h );
+//  #endif
     
     for ( int i=0; i < numrects; i++ )
     {
@@ -793,11 +798,11 @@ void ONScripterLabel::fastFlushDirect( SDL_Rect rects[], int numrects, int refre
 
     SDL_UpdateWindowSurfaceRects( window, rects, numrects );
     
- #ifdef DEBUG
-    // clock_gettime( CLOCK_MONOTONIC, &end );
-    // delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
-    // printf("flush %d: %d %d %d %d\nTook %lu microseconds\n", refresh_mode, rect.x, rect.y, rect.w, rect.h, delta_us );
- #endif
+//  #ifdef DEBUG
+//     // clock_gettime( CLOCK_MONOTONIC, &end );
+//     // delta_us = (end.tv_sec - start.tv_sec) * 1000000 + (end.tv_nsec - start.tv_nsec) / 1000;
+//     // printf("flush %d: %d %d %d %d\nTook %lu microseconds\n", refresh_mode, rect.x, rect.y, rect.w, rect.h, delta_us );
+//  #endif
 }
 #endif
 
@@ -1194,8 +1199,8 @@ int ONScripterLabel::parseLine( )
             current_text_buffer->addBuffer( 0x0a );
             sentence_font.newLine();
             for (int i=0 ; i<indent_offset ; i++){
-                current_text_buffer->addBuffer(((char*)"@")[0]);
-                current_text_buffer->addBuffer(((char*)"@")[1]);
+                current_text_buffer->addBuffer(((char*)"ï¿½@")[0]);
+                current_text_buffer->addBuffer(((char*)"ï¿½@")[1]);
                 sentence_font.advanceCharInHankaku(2);
             }
         }

@@ -181,6 +181,18 @@ void ONScripterLabel::setupAnimationInfo( AnimationInfo *anim, FontInfo *info )
     else{
         SDL_Surface *surface = loadImage( anim->file_name );
 
+    #ifdef DEBUG
+        int new_w, new_h;
+        new_w = surface->w * 1.5;
+        new_h = surface->h * 1.5;
+
+        SDL_Surface *scale_surface = AnimationInfo::allocSurface( new_w, new_h );
+
+        resizeSurface( surface, scale_surface );
+        SDL_FreeSurface( surface );
+        surface = scale_surface;
+    #endif
+
         SDL_Surface *surface_m = NULL;
         if (anim->trans_mode == AnimationInfo::TRANS_MASK)
             surface_m = loadImage( anim->mask_file_name );
