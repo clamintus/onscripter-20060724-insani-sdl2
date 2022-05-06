@@ -1492,6 +1492,10 @@ void ONScripterLabel::loadCursor( int no, const char *str, int x, int y, bool ab
     cursor_info[ no ].pos.x = x;
     cursor_info[ no ].pos.y = y;
 
+#ifdef DEBUG
+    noscale_flag = true;
+#endif
+
     parseTaggedString( &cursor_info[ no ] );
     setupAnimationInfo( &cursor_info[ no ] );
     if ( filelog_flag )
@@ -1501,6 +1505,10 @@ void ONScripterLabel::loadCursor( int no, const char *str, int x, int y, bool ab
         cursor_info[ no ].visible = true;
     else
         cursor_info[ no ].remove();
+        
+#ifdef DEBUG
+    noscale_flag = false;
+#endif
 }
 
 void ONScripterLabel::saveAll()

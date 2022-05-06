@@ -426,6 +426,10 @@ private:
     SDL_Surface *screenshot_surface; // Screenshot
     SDL_Surface *image_surface; // Reference for loadImage()
 
+#ifdef DEBUG
+    bool noscale_flag;
+#endif
+
     /* ---------------------------------------- */
     /* Button related variables */
     AnimationInfo btndef_info;
